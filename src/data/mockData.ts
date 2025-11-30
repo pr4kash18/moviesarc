@@ -1,0 +1,147 @@
+import { Movie, Category } from "@/types/movie";
+
+export const categories: Category[] = [
+  { id: "1", name: "Trending", slug: "trending" },
+  { id: "2", name: "Action", slug: "action" },
+  { id: "3", name: "Thriller", slug: "thriller" },
+  { id: "4", name: "Romance", slug: "romance" },
+  { id: "5", name: "Comedy", slug: "comedy" },
+  { id: "6", name: "Horror", slug: "horror" },
+  { id: "7", name: "Web Series", slug: "web-series" },
+  { id: "8", name: "Hindi", slug: "hindi" },
+  { id: "9", name: "English", slug: "english" },
+];
+
+export const movies: Movie[] = [
+  {
+    id: "1",
+    title: "Shadow Protocol",
+    description: "A retired spy is pulled back into action when a global threat emerges. With time running out, he must use all his skills to stop a catastrophic event.",
+    poster: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1920&h=1080&fit=crop",
+    year: 2024,
+    duration: "2h 18m",
+    rating: 8.7,
+    category: ["action", "thriller", "english"],
+    isPremium: true,
+  },
+  {
+    id: "2",
+    title: "Midnight in Mumbai",
+    description: "Two strangers meet on a train journey across India and discover unexpected connections that change their lives forever.",
+    poster: "https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1567157577867-05ccb1388e66?w=1920&h=1080&fit=crop",
+    year: 2024,
+    duration: "2h 5m",
+    rating: 8.2,
+    category: ["romance", "hindi", "trending"],
+    isPremium: false,
+  },
+  {
+    id: "3",
+    title: "The Last Heist",
+    description: "A team of elite thieves plan their final job - stealing from the most secure vault in the world. But not everyone can be trusted.",
+    poster: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1542204165-65bf26472b9b?w=1920&h=1080&fit=crop",
+    year: 2023,
+    duration: "2h 32m",
+    rating: 9.1,
+    category: ["action", "thriller", "trending", "english"],
+    isPremium: true,
+  },
+  {
+    id: "4",
+    title: "Comedy Nights",
+    description: "Follow the hilarious adventures of a dysfunctional family as they navigate modern life with their unique brand of humor.",
+    poster: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1920&h=1080&fit=crop",
+    year: 2024,
+    duration: "1h 45m",
+    rating: 7.8,
+    category: ["comedy", "hindi"],
+    isPremium: false,
+  },
+  {
+    id: "5",
+    title: "Haunted Manor",
+    description: "A family inherits an old mansion, only to discover it holds dark secrets and restless spirits from the past.",
+    poster: "https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1551269901-5c5e14c25df7?w=1920&h=1080&fit=crop",
+    year: 2024,
+    duration: "1h 58m",
+    rating: 7.5,
+    category: ["horror", "thriller", "english"],
+    isPremium: false,
+  },
+  {
+    id: "6",
+    title: "Digital Dreams",
+    description: "In a near future where dreams can be recorded, a detective must solve a murder that only exists in the victim's subconscious.",
+    poster: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=1920&h=1080&fit=crop",
+    year: 2024,
+    duration: "2h 22m",
+    rating: 8.9,
+    category: ["thriller", "trending", "english"],
+    isPremium: true,
+  },
+  {
+    id: "7",
+    title: "Love in Paris",
+    description: "Two ex-lovers unexpectedly reunite in the city of love and must decide if they can overcome what tore them apart.",
+    poster: "https://images.unsplash.com/photo-1460881680093-7f082f0291e4?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1920&h=1080&fit=crop",
+    year: 2023,
+    duration: "1h 52m",
+    rating: 7.9,
+    category: ["romance", "english"],
+    isPremium: false,
+  },
+  {
+    id: "8",
+    title: "Street Fighter",
+    description: "An underground fighter must win one last tournament to save his family from dangerous criminals.",
+    poster: "https://images.unsplash.com/photo-1555992336-fb0d29498b13?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=1920&h=1080&fit=crop",
+    year: 2024,
+    duration: "2h 10m",
+    rating: 8.4,
+    category: ["action", "hindi", "trending"],
+    isPremium: true,
+  },
+  {
+    id: "9",
+    title: "The Investigation",
+    description: "A gripping web series following a journalist who uncovers a massive conspiracy while investigating a seemingly simple story.",
+    poster: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1920&h=1080&fit=crop",
+    year: 2024,
+    duration: "8 Episodes",
+    rating: 9.0,
+    category: ["web-series", "thriller", "trending"],
+    isPremium: true,
+  },
+  {
+    id: "10",
+    title: "Laugh Out Loud",
+    description: "A stand-up comedian's journey from small clubs to stardom, filled with hilarious moments and heartfelt lessons.",
+    poster: "https://images.unsplash.com/photo-1598387993441-a364f854c3e1?w=400&h=600&fit=crop",
+    backdrop: "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=1920&h=1080&fit=crop",
+    year: 2023,
+    duration: "1h 38m",
+    rating: 7.6,
+    category: ["comedy", "english"],
+    isPremium: false,
+  },
+];
+
+export const featuredMovie = movies[2];
+
+export const trendingMovies = movies.filter(m => m.category.includes("trending"));
+export const actionMovies = movies.filter(m => m.category.includes("action"));
+export const romanceMovies = movies.filter(m => m.category.includes("romance"));
+export const thrillerMovies = movies.filter(m => m.category.includes("thriller"));
+export const comedyMovies = movies.filter(m => m.category.includes("comedy"));
+export const horrorMovies = movies.filter(m => m.category.includes("horror"));
+export const webSeries = movies.filter(m => m.category.includes("web-series"));
+export const premiumMovies = movies.filter(m => m.isPremium);

@@ -1,15 +1,37 @@
-import { useParams, Link } from "react-router-dom";
+import { useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { Play, Plus, Share2, Star, Clock, Calendar, Crown, ArrowLeft } from "lucide-react";
+import { Play, Plus, Share2, Star, Clock, Calendar, Crown, ArrowLeft, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MovieRow from "@/components/MovieRow";
 import { Button } from "@/components/ui/button";
 import { movies, trendingMovies } from "@/data/mockData";
+import { useAuth } from "@/hooks/useAuth";
 
 const MovieDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const movie = movies.find((m) => m.id === id);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/login");
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   if (!movie) {
     return (

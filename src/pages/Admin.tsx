@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import AddMovieDialog from "@/components/admin/AddMovieDialog";
 
 type TabType = "dashboard" | "movies" | "users" | "ads" | "payments" | "settings";
 
@@ -38,6 +39,7 @@ const Admin = () => {
   const [users, setUsers] = useState<Profile[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [addMovieOpen, setAddMovieOpen] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user, isAdmin, loading: authLoading, signOut } = useAuth();
@@ -220,11 +222,17 @@ const Admin = () => {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="font-display text-3xl">Movies</h2>
-                <Button variant="hero">
+                <Button variant="hero" onClick={() => setAddMovieOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Movie
                 </Button>
               </div>
+
+              <AddMovieDialog
+                open={addMovieOpen}
+                onOpenChange={setAddMovieOpen}
+                onSuccess={fetchData}
+              />
 
               <div className="relative max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

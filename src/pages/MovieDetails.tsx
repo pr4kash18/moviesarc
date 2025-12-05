@@ -6,22 +6,25 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MovieRow from "@/components/MovieRow";
 import { Button } from "@/components/ui/button";
-import { movies, trendingMovies } from "@/data/mockData";
 import { useAuth } from "@/hooks/useAuth";
+import { useMovie, useAllMovies, useTrendingMovies } from "@/hooks/useMovies";
 
 const MovieDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
-  const movie = movies.find((m) => m.id === id);
+  const { user, loading: authLoading } = useAuth();
+  
+  const { data: movie, isLoading: movieLoading } = useMovie(id || "");
+  const { data: allMovies = [] } = useAllMovies();
+  const { data: trendingMovies = [] } = useTrendingMovies();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!authLoading && !user) {
       navigate("/login");
     }
-  }, [user, loading, navigate]);
+  }, [user, authLoading, navigate]);
 
-  if (loading) {
+  if (authLoading || movieLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -46,9 +49,9 @@ const MovieDetails = () => {
     );
   }
 
-  const similarMovies = movies.filter(
+  const similarMovies = allMovies.filter(
     (m) => m.id !== movie.id && m.category.some((c) => movie.category.includes(c))
-  );
+  ).slice(0, 10);
 
   return (
     <>
@@ -170,14 +173,18 @@ const MovieDetails = () => {
 
         {/* Similar Movies */}
         <section className="pt-24 md:pt-16">
-          <MovieRow
-            title="You May Also Like"
-            movies={similarMovies}
-          />
-          <MovieRow
-            title="Trending Now"
-            movies={trendingMovies}
-          />
+          {similarMovies.length > 0 && (
+            <MovieRow
+              title="You May Also Like"
+              movies={similarMovies}
+            />
+          )}
+          {trendingMovies.length > 0 && (
+            <MovieRow
+              title="Trending Now"
+              movies={trendingMovies}
+            />
+          )}
         </section>
 
         <Footer />

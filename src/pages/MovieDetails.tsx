@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import { Play, Plus, Share2, Star, Clock, Calendar, Crown, ArrowLeft, Loader2 } from "lucide-react";
@@ -8,15 +8,37 @@ import MovieRow from "@/components/MovieRow";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useMovie, useAllMovies, useTrendingMovies } from "@/hooks/useMovies";
+import VideoPlayerDialog from "@/components/VideoPlayerDialog";
+import { useToast } from "@/hooks/use-toast";
 
 const MovieDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { toast } = useToast();
+  const [videoOpen, setVideoOpen] = useState(false);
   
   const { data: movie, isLoading: movieLoading } = useMovie(id || "");
   const { data: allMovies = [] } = useAllMovies();
   const { data: trendingMovies = [] } = useTrendingMovies();
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: movie?.title, url });
+      } catch (err) {
+        // User cancelled
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast({ title: "Link copied!", description: "Movie link copied to clipboard" });
+    }
+  };
+
+  const handleMyList = () => {
+    toast({ title: "Coming soon!", description: "My List feature will be available soon" });
+  };
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -153,16 +175,16 @@ const MovieDetails = () => {
                       </Button>
                     </Link>
                   ) : (
-                    <Button variant="hero" size="xl" className="gap-2">
+                    <Button variant="hero" size="xl" className="gap-2" onClick={() => setVideoOpen(true)}>
                       <Play className="h-5 w-5 fill-current" />
                       Watch Now
                     </Button>
                   )}
-                  <Button variant="glass" size="xl" className="gap-2">
+                  <Button variant="glass" size="xl" className="gap-2" onClick={handleMyList}>
                     <Plus className="h-5 w-5" />
                     My List
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-14 w-14">
+                  <Button variant="ghost" size="icon" className="h-14 w-14" onClick={handleShare}>
                     <Share2 className="h-5 w-5" />
                   </Button>
                 </div>
@@ -170,6 +192,16 @@ const MovieDetails = () => {
             </div>
           </div>
         </section>
+
+        {/* Video Player Dialog */}
+        {movie.videoUrl && (
+          <VideoPlayerDialog
+            open={videoOpen}
+            onOpenChange={setVideoOpen}
+            videoUrl={movie.videoUrl}
+            title={movie.title}
+          />
+        )}
 
         {/* Similar Movies */}
         <section className="pt-24 md:pt-16">

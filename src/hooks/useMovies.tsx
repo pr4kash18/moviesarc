@@ -58,7 +58,7 @@ export const useAllMovies = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("movies")
-        .select(`*, categories(id, name, slug)`)
+        .select(`*, categories!movies_category_id_fkey(id, name, slug)`)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -73,7 +73,7 @@ export const useTrendingMovies = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("movies")
-        .select(`*, categories(id, name, slug)`)
+        .select(`*, categories!movies_category_id_fkey(id, name, slug)`)
         .eq("is_trending", true)
         .order("created_at", { ascending: false });
 
@@ -89,7 +89,7 @@ export const usePremiumMovies = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("movies")
-        .select(`*, categories(id, name, slug)`)
+        .select(`*, categories!movies_category_id_fkey(id, name, slug)`)
         .eq("is_premium", true)
         .order("created_at", { ascending: false });
 
@@ -105,7 +105,7 @@ export const useMoviesByCategory = (categorySlug: string) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("movies")
-        .select(`*, categories!inner(id, name, slug)`)
+        .select(`*, categories!movies_category_id_fkey!inner(id, name, slug)`)
         .eq("categories.slug", categorySlug)
         .order("created_at", { ascending: false });
 
@@ -122,7 +122,7 @@ export const useMovie = (id: string) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("movies")
-        .select(`*, categories(id, name, slug)`)
+        .select(`*, categories!movies_category_id_fkey(id, name, slug)`)
         .eq("id", id)
         .maybeSingle();
 
@@ -140,7 +140,7 @@ export const useFeaturedMovie = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("movies")
-        .select(`*, categories(id, name, slug)`)
+        .select(`*, categories!movies_category_id_fkey(id, name, slug)`)
         .eq("is_trending", true)
         .limit(1)
         .maybeSingle();
@@ -150,7 +150,7 @@ export const useFeaturedMovie = () => {
         // Fallback to any movie if no trending
         const { data: anyMovie } = await supabase
           .from("movies")
-          .select(`*, categories(id, name, slug)`)
+          .select(`*, categories!movies_category_id_fkey(id, name, slug)`)
           .limit(1)
           .maybeSingle();
         if (anyMovie) return transformMovie(anyMovie);

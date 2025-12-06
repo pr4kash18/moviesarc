@@ -1,12 +1,14 @@
 import { Helmet } from "react-helmet";
-import { Check, Crown, Zap, Film, Shield, Star } from "lucide-react";
+import { Check, Crown, Zap, Film, Shield, Star, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MovieRow from "@/components/MovieRow";
 import { Button } from "@/components/ui/button";
-import { premiumMovies } from "@/data/mockData";
+import { usePremiumMovies } from "@/hooks/useMovies";
 
 const Premium = () => {
+  const { data: premiumMovies = [], isLoading } = usePremiumMovies();
+
   const features = [
     { icon: Film, text: "Unlimited access to all Premium content" },
     { icon: Zap, text: "Ad-free streaming experience" },
@@ -127,11 +129,24 @@ const Premium = () => {
           </section>
 
           {/* Premium Content Preview */}
-          <MovieRow
-            title="Premium Content"
-            movies={premiumMovies}
-            size="large"
-          />
+          {isLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : premiumMovies.length > 0 ? (
+            <MovieRow
+              title="Premium Content"
+              movies={premiumMovies}
+              size="large"
+            />
+          ) : (
+            <section className="py-12">
+              <div className="container mx-auto px-4 text-center">
+                <Film className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">No premium content available yet.</p>
+              </div>
+            </section>
+          )}
         </main>
 
         <Footer />

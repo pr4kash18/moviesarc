@@ -14,6 +14,8 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
+import Movies from "./pages/Movies";
+import Series from "./pages/Series";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +30,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/movie/:id" element={<MovieDetails />} />
+            <Route path="/movies" element={<Movies />} />
+            <Route path="/series" element={<Series />} />
             <Route path="/search" element={<Search />} />
             <Route path="/premium" element={<Premium />} />
             <Route path="/login" element={<Login />} />

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Upload, Link, HardDrive } from "lucide-react";
+import { Loader2, Link, HardDrive, FileUp } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +31,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import ChunkedUpload from "./ChunkedUpload";
 
 interface Category {
   id: string;
@@ -348,7 +349,7 @@ const AddMovieDialog = ({ open, onOpenChange, onSuccess }: AddMovieDialogProps) 
                   size="sm"
                   onClick={() => setUploadSource("local")}
                 >
-                  <Upload className="h-4 w-4 mr-2" />
+                  <FileUp className="h-4 w-4 mr-2" />
                   Local Upload
                 </Button>
               </div>
@@ -426,38 +427,18 @@ const AddMovieDialog = ({ open, onOpenChange, onSuccess }: AddMovieDialogProps) 
 
               {uploadSource === "local" && (
                 <div className="space-y-4">
-                  <div>
-                    <Label>Upload Video File</Label>
-                    <Input
-                      type="file"
-                      accept="video/*"
-                      disabled={uploading}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleFileUpload(file, "video_url");
-                      }}
-                      className="mt-2"
-                    />
-                    {form.watch("video_url") && (
-                      <p className="text-xs text-green-500 mt-1">Video uploaded ✓</p>
-                    )}
-                  </div>
-                  <div>
-                    <Label>Upload Trailer File</Label>
-                    <Input
-                      type="file"
-                      accept="video/*"
-                      disabled={uploading}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleFileUpload(file, "trailer_url");
-                      }}
-                      className="mt-2"
-                    />
-                    {form.watch("trailer_url") && (
-                      <p className="text-xs text-green-500 mt-1">Trailer uploaded ✓</p>
-                    )}
-                  </div>
+                  <ChunkedUpload
+                    label="Upload Video File"
+                    accept="video/*"
+                    folder="videos"
+                    onUploadComplete={(url) => form.setValue("video_url", url)}
+                  />
+                  <ChunkedUpload
+                    label="Upload Trailer File"
+                    accept="video/*"
+                    folder="videos"
+                    onUploadComplete={(url) => form.setValue("trailer_url", url)}
+                  />
                 </div>
               )}
             </div>
@@ -477,19 +458,12 @@ const AddMovieDialog = ({ open, onOpenChange, onSuccess }: AddMovieDialogProps) 
                   </FormItem>
                 )}
               />
-              <div>
-                <Label>Or Upload Poster</Label>
-                <Input
-                  type="file"
-                  accept="image/*"
-                  disabled={uploading}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleFileUpload(file, "poster_url");
-                  }}
-                  className="mt-2"
-                />
-              </div>
+              <ChunkedUpload
+                label="Or Upload Poster"
+                accept="image/*"
+                folder="posters"
+                onUploadComplete={(url) => form.setValue("poster_url", url)}
+              />
             </div>
 
             {/* Submit */}

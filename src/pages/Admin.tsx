@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import AddMovieDialog from "@/components/admin/AddMovieDialog";
+import AdminSettings from "@/components/admin/AdminSettings";
 
 type TabType = "dashboard" | "movies" | "users" | "ads" | "payments" | "settings";
 
@@ -380,14 +381,7 @@ const Admin = () => {
             </div>
           )}
 
-          {activeTab === "settings" && (
-            <div className="space-y-6">
-              <h2 className="font-display text-3xl">Settings</h2>
-              <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                <p className="text-muted-foreground">Admin settings will be available here.</p>
-              </div>
-            </div>
-          )}
+          {activeTab === "settings" && <AdminSettings />}
         </main>
       </div>
     </>

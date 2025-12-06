@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet";
-import { Mail, MessageSquare, Send } from "lucide-react";
+import { Mail, MessageSquare, Send, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -8,22 +8,43 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Contact = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Message Sent!",
-      description: "We'll get back to you as soon as possible.",
-    });
-    setName("");
-    setEmail("");
-    setMessage("");
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.functions.invoke("send-contact-email", {
+        body: { name, email, message },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Message Sent!",
+        description: "We'll get back to you as soon as possible.",
+      });
+      setName("");
+      setEmail("");
+      setMessage("");
+    } catch (error: any) {
+      console.error("Contact form error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again or email us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -61,6 +82,7 @@ const Contact = () => {
                       onChange={(e) => setName(e.target.value)}
                       className="h-12 bg-secondary"
                       required
+                      disabled={loading}
                     />
                   </div>
 
@@ -74,6 +96,7 @@ const Contact = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       className="h-12 bg-secondary"
                       required
+                      disabled={loading}
                     />
                   </div>
 
@@ -86,12 +109,17 @@ const Contact = () => {
                       onChange={(e) => setMessage(e.target.value)}
                       className="min-h-[150px] bg-secondary"
                       required
+                      disabled={loading}
                     />
                   </div>
 
-                  <Button type="submit" variant="hero" size="lg" className="w-full gap-2">
-                    <Send className="h-4 w-4" />
-                    Send Message
+                  <Button type="submit" variant="hero" size="lg" className="w-full gap-2" disabled={loading}>
+                    {loading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                    {loading ? "Sending..." : "Send Message"}
                   </Button>
                 </form>
               </div>
@@ -101,7 +129,12 @@ const Contact = () => {
                 <div className="bg-card border border-border rounded-xl p-6 text-center">
                   <Mail className="h-8 w-8 mx-auto text-primary mb-3" />
                   <h3 className="font-semibold mb-2">Email Us</h3>
-                  <p className="text-muted-foreground text-sm">support@moviesarc.com</p>
+                  <a 
+                    href="mailto:cpr4kash18@gmail.com" 
+                    className="text-muted-foreground text-sm hover:text-primary transition-colors"
+                  >
+                    cpr4kash18@gmail.com
+                  </a>
                 </div>
                 <div className="bg-card border border-border rounded-xl p-6 text-center">
                   <MessageSquare className="h-8 w-8 mx-auto text-primary mb-3" />

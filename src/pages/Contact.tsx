@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet";
-import { Mail, MessageSquare, Send, Loader2 } from "lucide-react";
+import { Mail, MessageSquare, Send, Loader2, Instagram, Linkedin, Github } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const Contact = () => {
   const [name, setName] = useState("");
@@ -16,6 +17,7 @@ const Contact = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { settings } = useSiteSettings();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,10 +52,10 @@ const Contact = () => {
   return (
     <>
       <Helmet>
-        <title>Contact Us - MoviesArc</title>
+        <title>Contact Us - {settings.siteName}</title>
         <meta
           name="description"
-          content="Get in touch with the MoviesArc team. We're here to help with any questions or feedback."
+          content={`Get in touch with the ${settings.siteName} team. We're here to help with any questions or feedback.`}
         />
       </Helmet>
 
@@ -130,10 +132,10 @@ const Contact = () => {
                   <Mail className="h-8 w-8 mx-auto text-primary mb-3" />
                   <h3 className="font-semibold mb-2">Email Us</h3>
                   <a 
-                    href="mailto:cpr4kash18@gmail.com" 
+                    href={`mailto:${settings.supportEmail}`}
                     className="text-muted-foreground text-sm hover:text-primary transition-colors"
                   >
-                    cpr4kash18@gmail.com
+                    {settings.supportEmail}
                   </a>
                 </div>
                 <div className="bg-card border border-border rounded-xl p-6 text-center">
@@ -142,6 +144,48 @@ const Contact = () => {
                   <p className="text-muted-foreground text-sm">Available 24/7</p>
                 </div>
               </div>
+
+              {/* Social Links */}
+              {(settings.instagram || settings.linkedin || settings.github) && (
+                <div className="mt-12 text-center">
+                  <h3 className="font-semibold mb-4">Follow Us</h3>
+                  <div className="flex items-center justify-center gap-6">
+                    {settings.instagram && (
+                      <a
+                        href={settings.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        <Instagram className="h-6 w-6" />
+                        <span>Instagram</span>
+                      </a>
+                    )}
+                    {settings.linkedin && (
+                      <a
+                        href={settings.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        <Linkedin className="h-6 w-6" />
+                        <span>LinkedIn</span>
+                      </a>
+                    )}
+                    {settings.github && (
+                      <a
+                        href={settings.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        <Github className="h-6 w-6" />
+                        <span>GitHub</span>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </main>

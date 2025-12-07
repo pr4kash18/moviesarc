@@ -131,7 +131,13 @@ export const SiteSettingsProvider = ({ children }: { children: ReactNode }) => {
 export const useSiteSettings = () => {
   const context = useContext(SiteSettingsContext);
   if (context === undefined) {
-    throw new Error("useSiteSettings must be used within a SiteSettingsProvider");
+    // Return default settings if used outside provider (graceful fallback)
+    return {
+      settings: defaultSettings,
+      loading: false,
+      updateSettings: async () => {},
+      refreshSettings: async () => {},
+    };
   }
   return context;
 };

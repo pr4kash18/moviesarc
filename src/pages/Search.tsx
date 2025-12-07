@@ -5,12 +5,15 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MovieCard from "@/components/MovieCard";
 import { Input } from "@/components/ui/input";
-import { movies, categories } from "@/data/mockData";
+import { useAllMovies, useCategories } from "@/hooks/useMovies";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Search = () => {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const { data: movies = [], isLoading: moviesLoading } = useAllMovies();
+  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
 
   const filteredMovies = useMemo(() => {
     let results = movies;
@@ -20,18 +23,24 @@ const Search = () => {
       results = results.filter(
         (movie) =>
           movie.title.toLowerCase().includes(lowerQuery) ||
-          movie.description.toLowerCase().includes(lowerQuery)
+          (movie.description && movie.description.toLowerCase().includes(lowerQuery))
       );
     }
 
     if (activeCategory) {
-      results = results.filter((movie) =>
-        movie.category.includes(activeCategory)
-      );
+      // Find the category slug for the selected ID
+      const selectedCat = categories.find((c) => c.id === activeCategory);
+      if (selectedCat) {
+        results = results.filter((movie) =>
+          movie.category.includes(selectedCat.slug)
+        );
+      }
     }
 
     return results;
-  }, [query, activeCategory]);
+  }, [query, activeCategory, movies]);
+
+  const isLoading = moviesLoading || categoriesLoading;
 
   return (
     <>
@@ -89,22 +98,34 @@ const Search = () => {
               >
                 All
               </button>
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setActiveCategory(category.slug)}
-                  className={cn(
-                    "category-pill",
-                    activeCategory === category.slug && "active"
-                  )}
-                >
-                  {category.name}
-                </button>
-              ))}
+              {categoriesLoading ? (
+                Array(6).fill(0).map((_, i) => (
+                  <Skeleton key={i} className="h-8 w-20 rounded-full" />
+                ))
+              ) : (
+                categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setActiveCategory(category.id)}
+                    className={cn(
+                      "category-pill",
+                      activeCategory === category.id && "active"
+                    )}
+                  >
+                    {category.name}
+                  </button>
+                ))
+              )}
             </div>
 
             {/* Results */}
-            {filteredMovies.length > 0 ? (
+            {isLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+                {Array(12).fill(0).map((_, i) => (
+                  <Skeleton key={i} className="aspect-[2/3] rounded-lg" />
+                ))}
+              </div>
+            ) : filteredMovies.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
                 {filteredMovies.map((movie, index) => (
                   <div
@@ -121,7 +142,9 @@ const Search = () => {
                 <SearchIcon className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
                 <h2 className="font-display text-2xl mb-2">No Results Found</h2>
                 <p className="text-muted-foreground">
-                  Try adjusting your search or filter to find what you're looking for.
+                  {movies.length === 0 
+                    ? "No movies have been uploaded yet. Check back later!"
+                    : "Try adjusting your search or filter to find what you're looking for."}
                 </p>
               </div>
             )}

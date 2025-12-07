@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
+import { Instagram, Linkedin, Github } from "lucide-react";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const Footer = () => {
+  const { settings } = useSiteSettings();
+
   return (
     <footer className="bg-card border-t border-border mt-16">
       <div className="container mx-auto px-4 py-12">
@@ -8,11 +12,48 @@ const Footer = () => {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="font-display text-2xl text-primary">
-              MOVIESARC
+              {settings.siteName.toUpperCase()}
             </Link>
             <p className="mt-3 text-sm text-muted-foreground">
-              Your ultimate destination for movies and web series. Stream unlimited content anytime, anywhere.
+              {settings.siteDescription}
             </p>
+            
+            {/* Social Links */}
+            <div className="flex items-center gap-4 mt-4">
+              {settings.instagram && (
+                <a
+                  href={settings.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                  aria-label="Instagram"
+                >
+                  <Instagram className="h-5 w-5" />
+                </a>
+              )}
+              {settings.linkedin && (
+                <a
+                  href={settings.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                  aria-label="LinkedIn"
+                >
+                  <Linkedin className="h-5 w-5" />
+                </a>
+              )}
+              {settings.github && (
+                <a
+                  href={settings.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                  aria-label="GitHub"
+                >
+                  <Github className="h-5 w-5" />
+                </a>
+              )}
+            </div>
           </div>
 
           {/* Browse */}
@@ -48,7 +89,7 @@ const Footer = () => {
 
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} MoviesArc. All rights reserved.
+            © {new Date().getFullYear()} {settings.siteName}. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
             <span>Made with ❤️ for movie lovers</span>

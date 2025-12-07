@@ -12,8 +12,6 @@ interface ChunkedUploadProps {
   folder: "videos" | "posters";
 }
 
-const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks for faster uploads
-
 const ChunkedUpload = ({ onUploadComplete, accept, label, folder }: ChunkedUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -34,74 +32,62 @@ const ChunkedUpload = ({ onUploadComplete, accept, label, folder }: ChunkedUploa
       const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
       const filePath = `${folder}/${uniqueId}.${fileExt}`;
 
-      // For small files (< 10MB), use direct upload
-      if (file.size < 10 * 1024 * 1024) {
-        // Simulate progress for small files
-        const progressInterval = setInterval(() => {
-          setProgress(prev => Math.min(prev + 20, 90));
-        }, 200);
+      // Get the Supabase URL and anon key
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      
+      // Get current session for auth
+      const { data: { session } } = await supabase.auth.getSession();
+      const authToken = session?.access_token || supabaseKey;
 
-        const { error: uploadError } = await supabase.storage
-          .from("movies")
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false
-          });
-
-        clearInterval(progressInterval);
-
-        if (uploadError) throw uploadError;
-
-        setProgress(100);
-      } else {
-        // For larger files, upload in chunks
-        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-        let uploadedChunks = 0;
-
-        // For Supabase, we still need to upload the whole file at once,
-        // but we can show progress based on file reading
-        const reader = new FileReader();
+      // Use XMLHttpRequest for real progress tracking
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
         
-        await new Promise<void>((resolve, reject) => {
-          reader.onload = async () => {
-            try {
-              // Update progress during read
-              setProgress(30);
-              
-              const { error: uploadError } = await supabase.storage
-                .from("movies")
-                .upload(filePath, file, {
-                  cacheControl: '3600',
-                  upsert: false
-                });
-
-              if (uploadError) {
-                reject(uploadError);
-              } else {
-                setProgress(100);
-                resolve();
-              }
-            } catch (err) {
-              reject(err);
-            }
-          };
-
-          reader.onprogress = (event) => {
-            if (event.lengthComputable) {
-              const readProgress = (event.loaded / event.total) * 30;
-              setProgress(readProgress);
-            }
-          };
-
-          reader.onerror = () => reject(reader.error);
-          reader.readAsArrayBuffer(file);
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const percentComplete = Math.round((event.loaded / event.total) * 100);
+            setProgress(percentComplete);
+          }
         });
-      }
+
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve();
+          } else {
+            try {
+              const errorData = JSON.parse(xhr.responseText);
+              reject(new Error(errorData.message || `Upload failed with status ${xhr.status}`));
+            } catch {
+              reject(new Error(`Upload failed with status ${xhr.status}`));
+            }
+          }
+        });
+
+        xhr.addEventListener('error', () => {
+          reject(new Error('Network error during upload'));
+        });
+
+        xhr.addEventListener('abort', () => {
+          reject(new Error('Upload was cancelled'));
+        });
+
+        // Open connection to Supabase Storage
+        xhr.open('POST', `${supabaseUrl}/storage/v1/object/movies/${filePath}`);
+        
+        // Set headers
+        xhr.setRequestHeader('Authorization', `Bearer ${authToken}`);
+        xhr.setRequestHeader('x-upsert', 'false');
+        
+        // Send the file directly
+        xhr.send(file);
+      });
 
       const { data: { publicUrl } } = supabase.storage
         .from("movies")
         .getPublicUrl(filePath);
 
+      setProgress(100);
       setCompleted(true);
       onUploadComplete(publicUrl);
       toast({ title: "Upload complete", description: `${file.name} uploaded successfully.` });
@@ -192,7 +178,7 @@ const ChunkedUpload = ({ onUploadComplete, accept, label, folder }: ChunkedUploa
             <div className="space-y-1">
               <Progress value={progress} className="h-2" />
               <p className="text-xs text-muted-foreground text-right">
-                {progress.toFixed(0)}%
+                {progress}% uploaded
               </p>
             </div>
           )}
